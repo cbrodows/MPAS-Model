@@ -120,6 +120,7 @@ module mpas_subdriver
       readStreamsArg = .false.
 
       ! If provided, error check the namelistFileParam and copy it to namelistFile to override default
+      write(0,*) 'CMB: if provided, error check and copy to namelistFile'
       if (present(namelistFileParam)) then
          if (len_trim(namelistFileParam) == 0) then
             write (0,*) 'WARNING: mpas_init argument namelistFileParam has 0 length and will be ignored'
@@ -133,6 +134,7 @@ module mpas_subdriver
          end if
       end if
       ! If provided, error check the streamsFileParam and copy it to streamsFile to override default
+      write(0,*) 'CMB: if provided, error check and copy to streamsFile'
       if (present(streamsFileParam)) then
          if (len_trim(streamsFileParam) == 0) then
             write (0,*) 'WARNING: mpas_init argument streamsFileParam has 0 length and will be ignored'
@@ -147,6 +149,7 @@ module mpas_subdriver
       end if
 
       ! If optional arguments weren't used, parse the command-line arguments for -n and -s
+      write(0,*) 'CMB: if optional arguments werent used...'
       if (.not. (present(namelistFileParam) .or. present(streamsFileParam))) then
          nArgs = command_argument_count()
          iArg = 1
@@ -181,16 +184,16 @@ module mpas_subdriver
             iArg = iArg + 1
          end do
       end if
-
+      write(0,*) 'CMB: allocate corelist'
       allocate(corelist)
       nullify(corelist % next)
-
+      write(0,*) 'CMB: allocate domainlist'
       allocate(corelist % domainlist)
       nullify(corelist % domainlist % next)
 
       domain_ptr => corelist % domainlist
       domain_ptr % core => corelist
-
+      write(0,*) 'CMB: mpas_allocate_domain'
       call mpas_allocate_domain(domain_ptr)
 
       domain_ptr % domainID = domainID
@@ -199,10 +202,12 @@ module mpas_subdriver
       !
       ! Initialize infrastructure
       !
+      write(0,*) 'CMB: framework_init_phase1'
       call mpas_framework_init_phase1(domain_ptr % dminfo, external_comm=external_comm)
 
 
 #ifdef CORE_ATMOSPHERE
+      write(0,*) 'CMB: atm_setup_core,domain'
       call atm_setup_core(corelist)
       call atm_setup_domain(domain_ptr)
 #endif
@@ -211,6 +216,7 @@ module mpas_subdriver
       call seaice_setup_domain(domain_ptr)
 #endif
 #ifdef CORE_INIT_ATMOSPHERE
+      write(0,*) 'CMB: init_atm_setup_core'
       call init_atm_setup_core(corelist)
       call init_atm_setup_domain(domain_ptr)
 #endif
@@ -223,6 +229,7 @@ module mpas_subdriver
       call ocn_setup_domain(domain_ptr)
 #endif
 #ifdef CORE_SW
+      write(0,*) 'CMB: sw_setup_core'
       call sw_setup_core(corelist)
       call sw_setup_domain(domain_ptr)
 #endif
@@ -296,7 +303,7 @@ module mpas_subdriver
       if ( .not. streamsExists ) then
          call mpas_log_write('Streams file '//trim(domain_ptr % streams_filename)//' does not exist.', messageType=MPAS_LOG_CRIT)
       end if
-
+      write(0,*) 'CMB: mpas_timer_start'
       call mpas_timer_start('total time')
       call mpas_timer_start('initialize')
 
@@ -316,6 +323,7 @@ module mpas_subdriver
 #else
       c_comm = domain_ptr % dminfo % comm
 #endif
+      write(0,*) 'CMB: xml_stream_get_attributes'
       call xml_stream_get_attributes(c_filename, c_mesh_stream, c_comm, &
                                      c_mesh_filename_temp, c_ref_time_temp, &
                                      c_filename_interval_temp, c_iotype, c_ierr)
@@ -358,6 +366,7 @@ module mpas_subdriver
       !
       ! Set up run-time streams
       !
+      write(0,*) 'CMB: MPAS_stream_mgr_init'
       call MPAS_stream_mgr_init(domain_ptr % streamManager, domain_ptr % ioContext, domain_ptr % clock, &
                                 domain_ptr % blocklist % allFields, domain_ptr % packages, domain_ptr % blocklist % allStructs)
 
@@ -386,6 +395,7 @@ module mpas_subdriver
       !
       ! Finalize the setup of blocks and fields
       !
+      write(0,*) 'CMB: mpas_bootstrap_framework_phase2'
       call mpas_bootstrap_framework_phase2(domain_ptr)
 
       !
