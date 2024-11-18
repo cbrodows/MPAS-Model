@@ -260,7 +260,7 @@ module mpas_subdriver
       if ( ierr /= 0 ) then
          call mpas_log_write('Namelist setup failed for core '//trim(domain_ptr % core % coreName), messageType=MPAS_LOG_CRIT)
       end if
-
+      write(0,*) 'CMB: init phase 2'
       call mpas_framework_init_phase2(domain_ptr)
 
       !
@@ -405,8 +405,9 @@ module mpas_subdriver
       if ( ierr /= 0 ) then
          call mpas_log_write('Core init failed for core '//trim(domain_ptr % core % coreName), messageType=MPAS_LOG_CRIT)
       end if
-
+      write(0,*) 'CMB: calling mpas_timer_stop'
       call mpas_timer_stop('initialize')
+      write(0,*) 'CMB: end of mpas_timer_stop; going out of mpas_init'
 
    end subroutine mpas_init
 
