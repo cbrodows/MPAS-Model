@@ -483,21 +483,24 @@ module mpas_bootstrapping
       integer :: tempDim
       integer :: i, err_level, err_local
 
-
+      write(0,*) 'CMB: calling mpas_pool_create_pool'
       call mpas_pool_create_pool(readableDimensions)
 
       err_level = mpas_pool_get_error_level()
+      write(0,*) 'CMB: calling mpas_pool_set_error_level'
       call mpas_pool_set_error_level(MPAS_POOL_SILENT)
 
       call mpas_log_write(' ')
       call mpas_log_write(' ')
 
       if (present(pio_file_desc)) then
+         write(0,*) 'CMB: pio_file_desc is present'
          call mpas_log_write('Reading dimensions from external PIO file handle ...')
 
          ! Build stream dimension pool from the list of fields
+         write(0,*) 'CMB: build stream dimension pool from the list of fields'
          call mpas_pool_create_pool(streamDimensions)
-
+         write(0,*) 'CMB: calling mpas_pool_begin_iteration'
          call mpas_pool_begin_iteration(domain % blocklist % allFields)
          do while ( mpas_pool_get_next_member(domain % blocklist % allFields, poolItr) )
             if ( poolItr % memberType == MPAS_POOL_FIELD ) then
@@ -557,7 +560,7 @@ module mpas_bootstrapping
          call mpas_pool_destroy_pool(streamDimensions)
 
       else
-
+         write(0,*) 'CMB: pio_file_desc not present'
          ! Reading dimensions from streams
          call mpas_log_write('Reading dimensions from input streams ...')
          call mpas_stream_mgr_begin_iteration(domain % streamManager)
@@ -565,10 +568,11 @@ module mpas_bootstrapping
                                                     activeProperty = streamActive) )
 
             if ( streamActive .and. ( streamDirection == MPAS_STREAM_INPUT .or. streamDirection == MPAS_STREAM_INPUT_OUTPUT ) ) then
-
+               write(0,*) 'CMB: calling mpas_stream_mgr_begin_iteration'
                call mpas_stream_mgr_begin_iteration(domain % streamManager, streamID=streamName)
 
                ! Build stream dimension pool from the list of fields
+               write(0,*) 'CMB: mpas_pool_create_pool'
                call mpas_pool_create_pool(streamDimensions)
 
                do while ( mpas_stream_mgr_get_next_field(domain % streamManager, streamName, fieldName, isActive=fieldActive) )
@@ -588,13 +592,16 @@ module mpas_bootstrapping
                end do
 
                ! Determine stream filename
+               write(0,*) 'CMB: determine stream filename'
                call mpas_get_stream_filename(domain % streamManager, streamID = streamName, filename = streamFilename, ierr = err_local)
 
                ! Determine stream io_type
+               write(0,*) 'CMB: determine stream io_type'
                call MPAS_stream_mgr_get_property(domain % streamManager, streamName, &
                                               MPAS_STREAM_PROPERTY_IOTYPE, ioType, ierr = err_local)
 
                ! Try to open file
+               write(0,*) 'CMB: try to open file'
                inputHandle = MPAS_io_open(trim(streamFilename), MPAS_IO_READ, ioType, domain % ioContext, ierr = err_local)
 
                ! If to determine if file was opened or not.
@@ -605,6 +612,7 @@ module mpas_bootstrapping
                                        //trim(streamFilename) )
 
                   ! Iterate over list of dimensions we determined we need from the above loop
+                  write(0,*) 'CMB: mpas_pool_begin_iteration with streamDimensions'
                   call mpas_pool_begin_iteration(streamDimensions)
                   do while ( mpas_pool_get_next_member(streamDimensions, poolItr) )
                      if ( poolItr % memberType == MPAS_POOL_DIMENSION ) then
@@ -643,8 +651,10 @@ module mpas_bootstrapping
                   end do
 
                   ! Close file
+                  write(0,*) 'CMB: close file'
                   call mpas_io_close(inputHandle)
                else
+                  write(0,*) 'CMB: cant open', streamFilename, 'in phase2'
                   call mpas_log_write(' ')
                   call mpas_log_write('  *** unable to open input file '//trim(streamFilename)//' for stream ''' &
                                        //trim(streamName)//'''')
