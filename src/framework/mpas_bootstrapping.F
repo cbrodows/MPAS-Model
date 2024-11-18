@@ -601,11 +601,12 @@ module mpas_bootstrapping
                                               MPAS_STREAM_PROPERTY_IOTYPE, ioType, ierr = err_local)
 
                ! Try to open file
-               write(0,*) 'CMB: try to open file'
+               write(0,*) 'CMB: try to open file', trim(streamFilename)
                inputHandle = MPAS_io_open(trim(streamFilename), MPAS_IO_READ, ioType, domain % ioContext, ierr = err_local)
 
                ! If to determine if file was opened or not.
                if ( err_local == MPAS_IO_NOERR ) then
+                  write(0,*) 'CMB: opened', trim(streamFilename), ' correctly'
 
                   call mpas_log_write(' ')
                   call mpas_log_write('----- reading dimensions from stream '''//trim(streamName)//''' using file ' &
@@ -654,7 +655,7 @@ module mpas_bootstrapping
                   write(0,*) 'CMB: close file'
                   call mpas_io_close(inputHandle)
                else
-                  write(0,*) 'CMB: cant open', streamFilename, 'in phase2'
+                  write(0,*) 'CMB: cant open', trim(streamFilename), 'in phase2'
                   call mpas_log_write(' ')
                   call mpas_log_write('  *** unable to open input file '//trim(streamFilename)//' for stream ''' &
                                        //trim(streamName)//'''')
