@@ -601,7 +601,7 @@ module mpas_bootstrapping
                                               MPAS_STREAM_PROPERTY_IOTYPE, ioType, ierr = err_local)
 
                ! Try to open file
-               write(0,*) 'CMB: try to open file', trim(streamFilename)
+               write(0,*) 'CMB: try to open file', trim(streamFilename), ' for reading'
                inputHandle = MPAS_io_open(trim(streamFilename), MPAS_IO_READ, ioType, domain % ioContext, ierr = err_local)
 
                ! If to determine if file was opened or not.
@@ -655,37 +655,38 @@ module mpas_bootstrapping
                   write(0,*) 'CMB: close file'
                   call mpas_io_close(inputHandle)
                else
-                  write(0,*) 'CMB: cant open', trim(streamFilename), 'in phase2'
+                  write(0,*) 'CMB: cant open', trim(streamFilename), ' in phase2'
                   call mpas_log_write(' ')
                   call mpas_log_write('  *** unable to open input file '//trim(streamFilename)//' for stream ''' &
                                        //trim(streamName)//'''')
                end if
 
                ! Destroy pool that contains list of streams dimensions
+               write(0,*) 'CMB: destroying pool that contains list of streams dimensions'
                call mpas_pool_destroy_pool(streamDimensions)
 
             else if ( .not. streamActive .and. ( streamDirection == MPAS_STREAM_INPUT .or. streamDirection == MPAS_STREAM_INPUT_OUTPUT ) ) then
-
+               write(0,*) 'CMB: skipping inactive stream ', trim(streamName), '.'
                call mpas_log_write(' ')
                call mpas_log_write('----- skipping inactive stream '''//trim(streamName)//'''')
             
             end if
 
          end do
-
+         write(0,*) 'CMB: done reading dimensions from input streams'
          call mpas_log_write(' ')
          call mpas_log_write('----- done reading dimensions from input streams -----')
          call mpas_log_write(' ')
          call mpas_log_write(' ')
 
       end if
-
       call mpas_pool_set_error_level(err_level)
 
       ! Allocate blocks, and copy indexTo arrays into blocks
+      write(0,*) 'CMB: allocate blocks and copy indexTo arrays into blocks'
       call mpas_block_creator_finalize_block_phase2(domain % streamManager, domain % blocklist, readableDimensions)
       call mpas_link_fields(domain)
-
+      write(0,*) 'CMB: mpas_pool_destroy_pool'
       call mpas_pool_destroy_pool(readableDimensions)
 
    end subroutine mpas_bootstrap_framework_phase2 !}}}
