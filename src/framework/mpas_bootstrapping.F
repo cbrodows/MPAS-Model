@@ -483,6 +483,9 @@ module mpas_bootstrapping
       integer :: tempDim
       integer :: i, err_level, err_local
 
+      ! CMB 
+      integer :: cmbres
+
       write(0,*) 'CMB: calling mpas_pool_create_pool'
       call mpas_pool_create_pool(readableDimensions)
 
@@ -602,6 +605,8 @@ module mpas_bootstrapping
 
                ! Try to open file
                write(0,*) 'CMB: try to open file', trim(streamFilename), ' for reading'
+               inquire( file=trim(streamFilename), exist=cmbres ) ! CMB
+               write(0,*) 'CMB: does file exist: ', cmbres, '?'
                inputHandle = MPAS_io_open(trim(streamFilename), MPAS_IO_READ, ioType, domain % ioContext, ierr = err_local)
 
                ! If to determine if file was opened or not.
