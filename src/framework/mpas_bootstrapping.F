@@ -484,7 +484,7 @@ module mpas_bootstrapping
       integer :: i, err_level, err_local
 
       ! CMB 
-      integer :: cmbres
+      logical :: cmbres
 
       write(0,*) 'CMB: calling mpas_pool_create_pool'
       call mpas_pool_create_pool(readableDimensions)
